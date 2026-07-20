@@ -37,6 +37,7 @@ This project solves **secure RAG with strict RBAC**:
 ## 3. High-Level Architecture
 
 At a high level, the system works like this:
+![Workflow diagram](image.png)
 
 1. **User & Auth**  
    - Users log in and are assigned roles (e.g., `admin`, `hr`, `finance`, `engineering`).
@@ -75,13 +76,6 @@ This project is intentionally built with tools that are friendly to local develo
 - **Containerization (future)**: Docker
 - **Orchestration (future)**: Kubernetes + Helm + ArgoCD GitOps
 - **CI/CD (future)**: GitHub Actions (build, test, push Docker image)
-
-Initial focus (current step):
-
-1. Project initialization (Next.js app structure).
-2. Ollama installation and local model selection.
-3. PostgreSQL + Prisma schema and connection setup.
-4. README and documentation polish.
 
 ---
 
