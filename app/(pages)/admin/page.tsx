@@ -1,9 +1,6 @@
-import React from 'react'
+// app/(pages)/admin/page.tsx
+import { redirect } from 'next/navigation'
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+export default function AdminPage() {
+  redirect('/admin/users')
 }
-
-export default page
