@@ -1,67 +1,98 @@
-'use client'
-import { useActionState } from 'react'
-import { loginAction } from '@/app/lib/actions/auth.actions'
+import { signIn } from '@/app/lib/auth'
+import { redirect } from 'next/navigation'
+import { AuthError } from 'next-auth'
 
-const initialState = { error: '' }
+async function loginAction(formData: FormData) {
+  'use server'
+  try {
+    await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirectTo: '/admin/users',
+    })
+  } catch (e) {
+    if (e instanceof AuthError) return redirect('/login?error=invalid')
+    throw e
+  }
+}
 
-export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState(loginAction, initialState)
-
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { error?: string }
+}) {
   return (
-    <>
-      <div style={{ height: 3, width: '100%', background: 'linear-gradient(90deg, var(--role-editor,#8b7ff2) 0%, var(--accent,#c9a24b) 55%, var(--role-viewer,#5fa8d3) 100%)', position: 'fixed', top: 0, left: 0, zIndex: 40 }} />
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: '0 16px' }}>
-        <div style={{ width: '100%', maxWidth: 380 }}>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
+      <div className="w-full max-w-[380px]">
 
-          {/* Brand */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 32 }}>
-            <div style={{ width: 42, height: 42, borderRadius: 10, background: 'linear-gradient(155deg, var(--accent) 0%, #8a6a24 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-contrast)', fontWeight: 800, fontSize: 18, marginBottom: 16, boxShadow: 'var(--shadow-md)' }}>R</div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>Welcome back</h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 5 }}>Sign in to the admin console</p>
+        {/* Brand */}
+        <div className="flex items-center gap-3 mb-8 justify-center">
+          <div
+            className="w-9 h-9 rounded-[6px] flex items-center justify-center font-extrabold text-sm text-[var(--accent-contrast)] shadow-[var(--shadow-sm-val)]"
+            style={{ background: 'linear-gradient(155deg, var(--accent) 0%, #8a6a24 100%)' }}
+          >
+            R
+          </div>
+          <div>
+            <div className="font-bold text-[14.5px] tracking-[-0.01em] text-[var(--text-primary)]">RAG Admin</div>
+            <div className="text-[11px] font-mono text-[var(--text-tertiary)] tracking-[0.02em]">RBAC_PLATFORM</div>
+          </div>
+        </div>
+
+        {/* Card */}
+        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[14px] shadow-[var(--shadow-md-val)] overflow-hidden">
+          <div className="px-7 pt-6 pb-5 border-b border-[var(--border)]">
+            <h1 className="text-[15px] font-bold tracking-[-0.01em] text-[var(--text-primary)]">Sign in</h1>
+            <p className="text-[12.5px] text-[var(--text-tertiary)] mt-0.5">Admin access only</p>
           </div>
 
-          {/* Card */}
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, boxShadow: 'var(--shadow-md)', padding: '28px 26px' }}>
+          <form action={loginAction} className="px-7 py-6 flex flex-col gap-4">
 
-            {state?.error && (
-              <div style={{ marginBottom: 20, padding: '11px 14px', borderRadius: 8, background: 'color-mix(in srgb, var(--danger) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--danger) 30%, transparent)', fontSize: 13, color: 'var(--danger)' }}>
-                {state.error}
+            {searchParams.error && (
+              <div className="text-[12.5px] text-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] border border-[color-mix(in_srgb,var(--danger)_25%,transparent)] rounded-[6px] px-3 py-2.5">
+                Invalid email or password.
               </div>
             )}
 
-            <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-              <div>
-                <label htmlFor="email" style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 7 }}>Email</label>
-                <input id="email" name="email" type="email" required autoComplete="email"
-                  placeholder="admin@company.com"
-                  style={{ width: '100%', background: 'var(--bg-subtle)', border: '1px solid var(--border-strong)', borderRadius: 6, padding: '10px 12px', fontSize: 13.5, fontFamily: 'var(--font-ibm-mono)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 0.15s ease, box-shadow 0.15s ease' }}
-                  onFocus={e => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 3px var(--accent-soft)' }}
-                  onBlur={e => { e.target.style.borderColor = 'var(--border-strong)'; e.target.style.boxShadow = 'none' }}
-                />
-              </div>
+            <div>
+              <label className="block text-[11px] font-semibold tracking-[0.06em] uppercase text-[var(--text-tertiary)] mb-1.5">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="admin@test.com"
+                className="w-full bg-[var(--bg-subtle)] border border-[var(--border-strong)] rounded-[6px] px-3 py-[10px] text-[13.5px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none focus:border-[var(--accent)] focus:ring-[3px] focus:ring-[var(--accent-soft)] transition-all duration-150"
+              />
+            </div>
 
-              <div>
-                <label htmlFor="password" style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 7 }}>Password</label>
-                <input id="password" name="password" type="password" required autoComplete="current-password"
-                  placeholder="••••••••"
-                  style={{ width: '100%', background: 'var(--bg-subtle)', border: '1px solid var(--border-strong)', borderRadius: 6, padding: '10px 12px', fontSize: 13.5, fontFamily: 'var(--font-ibm-mono)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 0.15s ease, box-shadow 0.15s ease' }}
-                  onFocus={e => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 3px var(--accent-soft)' }}
-                  onBlur={e => { e.target.style.borderColor = 'var(--border-strong)'; e.target.style.boxShadow = 'none' }}
-                />
-              </div>
+            <div>
+              <label className="block text-[11px] font-semibold tracking-[0.06em] uppercase text-[var(--text-tertiary)] mb-1.5">
+                Password
+              </label>
+              <input
+                name="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                placeholder="••••••••"
+                className="w-full bg-[var(--bg-subtle)] border border-[var(--border-strong)] rounded-[6px] px-3 py-[10px] text-[13.5px] font-mono text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none focus:border-[var(--accent)] focus:ring-[3px] focus:ring-[var(--accent-soft)] transition-all duration-150"
+              />
+            </div>
 
-              <button type="submit" disabled={isPending}
-                style={{ marginTop: 4, background: 'linear-gradient(155deg, var(--accent-strong), var(--accent))', color: 'var(--accent-contrast)', border: 'none', borderRadius: 6, padding: '11px 18px', fontSize: 13, fontWeight: 700, cursor: isPending ? 'not-allowed' : 'pointer', opacity: isPending ? 0.6 : 1, boxShadow: 'var(--shadow-sm)', transition: 'filter 0.15s ease', width: '100%' }}>
-                {isPending ? 'Signing in…' : 'Sign in'}
-              </button>
-            </form>
-          </div>
-
-          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-tertiary)', marginTop: 24, fontFamily: 'var(--font-ibm-mono)' }}>
-            RBAC_PLATFORM · ADMIN_ONLY
-          </p>
+            <button
+              type="submit"
+              className="mt-1 w-full py-[11px] rounded-[6px] text-[13px] font-bold text-[var(--accent-contrast)] shadow-[var(--shadow-sm-val)] hover:brightness-110 active:translate-y-px transition-all duration-150"
+              style={{ background: 'linear-gradient(155deg, var(--accent-strong), var(--accent))' }}
+            >
+              Sign in
+            </button>
+          </form>
         </div>
+
       </div>
-    </>
+    </div>
   )
 }

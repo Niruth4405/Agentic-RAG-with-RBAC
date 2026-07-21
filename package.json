@@ -19,6 +19,7 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.4.0",
+    "dotenv": "^17.4.2",
     "mongoose": "^9.4.1",
     "next": "16.2.10",
     "next-auth": "^5.0.0-beta.30",
@@ -44,6 +45,6 @@
     "typescript": "^5"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }
