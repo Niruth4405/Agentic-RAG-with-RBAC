@@ -1,14 +1,92 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  admin
+  hr
+  finance
+  engineering
+}
+
+enum AuditAction {
+  query
+  upload
+  denied
+  login
+}
+
+model Role {
+  id          Int                  @id @default(autoincrement())
+  name        RoleName             @unique
+  users       User[]
+  permissions DocumentPermission[]
+  auditLogs   AuditLog[]
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
+  passwordHash String
+  fullName     String?
+  roleId       Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  documents    Document[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+}
+
+model Document {
+  id          Int                  @id @default(autoincrement())
+  title       String
+  description String?
+  ownerId     Int?
+  owner       User?                @relation(fields: [ownerId], references: [id])
+  chunks      Chunk[]
+  permissions DocumentPermission[]
+  auditLogs   AuditLog[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
+
+model DocumentPermission {
+  id         Int      @id @default(autoincrement())
+  documentId Int
+  roleId     Int
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id])
+
+  @@unique([documentId, roleId])
+}
+
+model Chunk {
+  id         Int       @id @default(autoincrement())
+  documentId Int
+  chunkIndex Int
+  content    String
+  embedding  Unsupported("vector")?
+  document   Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+
+  @@index([documentId])
+  @@unique([documentId, chunkIndex])
+}
+
+model AuditLog {
+  id         Int         @id @default(autoincrement())
+  userId     Int?
+  roleId     Int?
+  action     AuditAction
+  queryText  String?
+  documentId Int?
+  allowed    Boolean?
+  reason     String?
+  user       User?       @relation(fields: [userId], references: [id])
+  role       Role?       @relation(fields: [roleId], references: [id])
+  document   Document?   @relation(fields: [documentId], references: [id])
+  createdAt  DateTime    @default(now())
 }
