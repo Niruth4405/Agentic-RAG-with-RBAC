@@ -2,7 +2,7 @@ import { auth } from '@/app/lib/auth'
 import { redirect } from 'next/navigation'
 import SidebarNav from '@/app/components/admin/SidebarNav'
 import MobileSidebarNav from '@/app/components/admin/MobileSidebarNav'
-import Topbar from '@/app/components/admin/Topbar'
+// import Topbar from '@/app/components/admin/Topbar'
 import ThemeScript from '@/app/components/admin/ThemeScript'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
