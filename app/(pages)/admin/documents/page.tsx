@@ -1,9 +1,27 @@
-import React from 'react'
+import { prisma } from '@/app/lib/prisma'
+import CreateDocument from '@/app/components/admin/CreateDocument'
+import DocumentsTable from '@/app/components/admin/DocumentsTable'
 
-const page = () => {
+export const dynamic = 'force-dynamic'
+
+export default async function DocumentsPage() {
+  const documents = await prisma.document.findMany({
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      permissions: {
+        select: { role: { select: { name: true } } },
+      },
+    },
+  })
+
   return (
-    <div>page</div>
+    <>
+      <CreateDocument />
+      <DocumentsTable documents={documents} />
+    </>
   )
 }
-
-export default page

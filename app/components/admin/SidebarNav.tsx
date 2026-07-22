@@ -39,8 +39,8 @@ const NAV = [
     label: 'Audit Logs',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-[17px] h-[17px] shrink-0" aria-hidden="true">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <path d="M14 2v6h6M9 13h6M9 17h6" />
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <path d="M9 9h6M9 13h6M9 17h4" />
       </svg>
     ),
   },
@@ -59,24 +59,25 @@ export default function SidebarNav({ initials, name, email, onNavClick }: Props)
   return (
     <aside className="bg-[var(--bg-subtle)] border-r border-[var(--border)] flex flex-col w-full h-full px-3 py-5">
 
-      {/* Brand mark */}
+      {/* Skip to content */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-[var(--accent)] text-white text-sm px-3 py-1.5 rounded-md"
+      >
+        Skip to content
+      </a>
+
+      {/* Brand */}
       <div className="flex items-center gap-3 px-2 pb-6">
-        {/* Logo */}
         <div
-          className="w-8 h-8 rounded-md shrink-0 flex items-center justify-center font-extrabold text-[13px] text-[var(--accent-contrast)] shadow-sm"
-          style={{ background: 'linear-gradient(140deg, var(--accent) 0%, var(--role-editor) 100%)' }}
+          className="w-8 h-8 rounded-md shrink-0 flex items-center justify-center font-extrabold text-[13px] text-white bg-[var(--accent)]"
           aria-hidden="true"
         >
           R
         </div>
-        {/* Text — hidden on collapsed (md), shown on lg+ */}
         <div className="hidden lg:block min-w-0">
-          <div className="font-semibold text-[13.5px] tracking-[-0.01em] text-[var(--text-primary)] leading-tight">
-            RAG Admin
-          </div>
-          <div className="text-[10.5px] font-mono text-[var(--text-tertiary)] tracking-[0.06em] mt-0.5">
-            RBAC_PLATFORM
-          </div>
+          <div className="font-semibold text-[13.5px] tracking-[-0.01em] text-[var(--text-primary)] leading-tight">RAG Admin</div>
+          <div className="text-[10.5px] font-mono text-[var(--text-tertiary)] tracking-[0.06em] mt-0.5">RBAC PLATFORM</div>
         </div>
       </div>
 
@@ -85,7 +86,7 @@ export default function SidebarNav({ initials, name, email, onNavClick }: Props)
         Management
       </p>
 
-      {/* Nav links */}
+      {/* Nav */}
       <nav className="flex flex-col gap-0.5" role="navigation" aria-label="Admin navigation">
         {NAV.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href)
@@ -109,12 +110,12 @@ export default function SidebarNav({ initials, name, email, onNavClick }: Props)
         })}
       </nav>
 
-      {/* User chip — bottom */}
+      {/* Active nav indicator dot — visible on icon-only (md) width */}
       <div className="mt-auto pt-4 border-t border-[var(--border)]">
-        <div className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-[var(--surface-hover)] transition-colors duration-150 cursor-default">
+        <div className="flex items-center gap-2.5 px-2 py-2 rounded-md cursor-default">
+          {/* Avatar: solid bg, no gradient */}
           <div
-            className="w-[28px] h-[28px] rounded-full shrink-0 flex items-center justify-center text-white text-[11px] font-bold"
-            style={{ background: 'linear-gradient(140deg, var(--role-editor), #4f46e5)' }}
+            className="w-[28px] h-[28px] rounded-full shrink-0 flex items-center justify-center text-white text-[11px] font-bold bg-[var(--accent)]"
             aria-hidden="true"
           >
             {initials}

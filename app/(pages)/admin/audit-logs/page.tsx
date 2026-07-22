@@ -1,9 +1,7 @@
-import React from 'react'
+import AuditLogsTable from '@/app/components/admin/AuditLogsTable'
 
-const page = () => {
-  return (
-    <div>Audit Logs</div>
-  )
+export const dynamic = 'force-dynamic'
+
+export default function AuditLogsPage() {
+  return <AuditLogsTable />
 }
-
-export default page

@@ -11,13 +11,11 @@ interface Props {
 export default function MobileSidebarNav({ initials, name, email }: Props) {
   const [open, setOpen] = useState(false)
 
-  // Lock body scroll when drawer is open
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
     window.addEventListener('keydown', handler)
@@ -34,14 +32,27 @@ export default function MobileSidebarNav({ initials, name, email }: Props) {
         style={{ opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none' }}
       />
 
-      {/* Drawer */}
+      {/* Drawer — slides in from left */}
       <aside
         aria-label="Mobile navigation"
+        aria-modal={open}
+        role="dialog"
         aria-hidden={!open}
-        className="fixed top-[2px] left-0 bottom-0 w-[240px] z-50 flex flex-col bg-[var(--bg-subtle)] border-r border-[var(--border)] shadow-[var(--shadow-lg-val)] transition-transform duration-250 ease-out"
+        className="fixed top-[2px] left-0 bottom-0 w-[240px] z-50 flex flex-col bg-[var(--bg-subtle)] border-r border-[var(--border)] shadow-[0_8px_40px_rgba(0,0,0,0.18)] transition-transform duration-250 ease-out"
         style={{ transform: open ? 'translateX(0)' : 'translateX(-100%)' }}
       >
-        {/* Reuse SidebarNav — always expanded in drawer */}
+        {/* Close button inside drawer */}
+        <button
+          onClick={() => setOpen(false)}
+          aria-label="Close navigation menu"
+          className="absolute top-3 right-3 w-[30px] h-[30px] flex items-center justify-center rounded-md text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] transition-colors duration-150 z-10"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Force lg: classes visible inside drawer (always expanded) */}
         <div className="flex flex-col h-full [&_.hidden.lg\\:block]:block [&_.hidden.lg\\:inline]:inline">
           <SidebarNav
             initials={initials}
@@ -52,19 +63,14 @@ export default function MobileSidebarNav({ initials, name, email }: Props) {
         </div>
       </aside>
 
-      {/* Hamburger trigger — rendered into Topbar via a portal-like slot */}
-      {/* Exported so Topbar can call setOpen */}
+      {/* Hidden trigger button — Topbar calls click() on this */}
       <button
         id="mobile-menu-trigger"
         onClick={() => setOpen(true)}
         aria-label="Open navigation menu"
         aria-expanded={open}
-        className="flex md:hidden w-[36px] h-[36px] items-center justify-center rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] transition-colors duration-150"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <path d="M3 12h18M3 6h18M3 18h18" />
-        </svg>
-      </button>
+        className="sr-only"
+      />
     </>
   )
 }
