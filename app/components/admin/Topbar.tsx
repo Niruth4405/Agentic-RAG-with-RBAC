@@ -1,29 +1,82 @@
+'use client'
+import { usePathname } from 'next/navigation'
 import ThemeToggle from './ThemeToggle'
 
-export default function Topbar() {
-  return (
-    <header className="h-16 flex items-center justify-between px-7 border-b border-[var(--border)] bg-[var(--bg-subtle)] sticky top-[3px] z-10">
-      {/* Search */}
-      <div className="flex items-center gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-[6px] px-3 py-[7px] w-[280px] text-[var(--text-tertiary)] text-[12.5px] hidden sm:flex">
-        <svg className="w-3.5 h-3.5 opacity-70 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>
-        </svg>
-        <span>Search users, roles, logs…</span>
-        <span className="ml-auto font-mono text-[10px] bg-[var(--surface-hover)] border border-[var(--border-strong)] rounded px-[5px] py-0.5 text-[var(--text-tertiary)]">⌘K</span>
-      </div>
+// Map route segments to human-readable labels
+const ROUTE_LABELS: Record<string, string> = {
+  users: 'Users',
+  documents: 'Documents',
+  permissions: 'Permissions',
+  'audit-logs': 'Audit Logs',
+}
 
-      {/* Right actions */}
-      <div className="flex items-center gap-2.5 ml-auto">
-        <ThemeToggle />
+interface Props {
+  initials: string
+  name: string
+}
+
+export default function Topbar({ initials, name }: Props) {
+  const pathname = usePathname()
+
+  // Derive breadcrumb label from current route
+  const segments = pathname.split('/').filter(Boolean)
+  // segments = ['admin', 'users'] → label = 'Users'
+  const lastSegment = segments[segments.length - 1] ?? ''
+  const pageLabel = ROUTE_LABELS[lastSegment] ?? 'Dashboard'
+
+  return (
+    <header className="h-14 flex items-center justify-between gap-4 px-5 lg:px-8 border-b border-[var(--border)] bg-[var(--bg-subtle)] sticky top-[2px] z-30 shrink-0">
+
+      {/* Left — hamburger (mobile) + breadcrumb */}
+      <div className="flex items-center gap-3 min-w-0">
+        {/* Hamburger button — clicks the trigger rendered by MobileSidebarNav */}
         <button
-          aria-label="Notifications"
-          className="w-[34px] h-[34px] rounded-[6px] border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] transition-colors duration-150"
+          className="flex md:hidden w-[36px] h-[36px] items-center justify-center rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] transition-colors duration-150 shrink-0"
+          aria-label="Open navigation menu"
+          onClick={() => {
+            // Trigger the MobileSidebarNav button via DOM — avoids prop drilling
+            const trigger = document.getElementById('mobile-menu-trigger') as HTMLButtonElement | null
+            trigger?.click()
+          }}
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M3 12h18M3 6h18M3 18h18" />
           </svg>
         </button>
+
+        {/* Breadcrumb */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] min-w-0">
+          <span className="text-[var(--text-tertiary)] hidden sm:inline">Admin</span>
+          <svg className="w-3 h-3 text-[var(--text-tertiary)] hidden sm:inline shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+          <span className="font-semibold text-[var(--text-primary)] truncate">{pageLabel}</span>
+        </nav>
+      </div>
+
+      {/* Right — search kbd hint, theme toggle, avatar */}
+      <div className="flex items-center gap-2 shrink-0">
+
+        {/* Search hint */}
+        <div className="hidden sm:flex items-center gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-md px-3 py-[6px] text-[var(--text-tertiary)] text-[12px] w-[220px] cursor-pointer hover:border-[var(--border-strong)] transition-colors duration-150">
+          <svg className="w-3.5 h-3.5 opacity-60 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.3-4.3" />
+          </svg>
+          <span className="flex-1">Search…</span>
+          <kbd className="font-mono text-[10px] bg-[var(--surface-hover)] border border-[var(--border-strong)] rounded px-1 py-0.5 leading-none">⌘K</kbd>
+        </div>
+
+        <ThemeToggle />
+
+        {/* Avatar */}
+        <div
+          className="w-[32px] h-[32px] rounded-full shrink-0 flex items-center justify-center text-white text-[11px] font-bold cursor-default select-none"
+          style={{ background: 'linear-gradient(140deg, var(--role-editor), #4f46e5)' }}
+          aria-label={`Logged in as ${name}`}
+          title={name}
+        >
+          {initials}
+        </div>
       </div>
     </header>
   )

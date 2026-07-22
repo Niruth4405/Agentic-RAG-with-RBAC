@@ -1,32 +1,56 @@
 import { auth } from '@/app/lib/auth'
 import { redirect } from 'next/navigation'
-import Sidebar from '@/app/components/admin/SidebarNav'
+import SidebarNav from '@/app/components/admin/SidebarNav'
+import MobileSidebarNav from '@/app/components/admin/MobileSidebarNav'
 import Topbar from '@/app/components/admin/Topbar'
+import ThemeScript from '@/app/components/admin/ThemeScript'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session || (session.user as any)?.role !== 'admin') redirect('/login')
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      {/* Brand colour strip */}
-      <div className="h-[3px] w-full shrink-0"
-        style={{ background: 'linear-gradient(90deg, var(--role-editor) 0%, var(--accent) 55%, var(--role-viewer) 100%)' }} />
+  const user = session.user as any
+  const name: string = user?.name ?? 'Admin'
+  const email: string = user?.email ?? ''
+  const initials: string = name
+    .split(' ')
+    .map((w: string) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
-      <div className="flex flex-1 min-h-0">
-        {/* Sidebar — 260px desktop, 76px tablet, hidden mobile */}
-        <div className="hidden md:flex w-[76px] lg:w-[260px] shrink-0 sticky top-[3px] h-[calc(100vh-3px)]">
-          <Sidebar />
+  return (
+    <>
+      <ThemeScript />
+      <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text-primary)]">
+        {/* Accent strip */}
+        <div
+          className="h-[2px] w-full shrink-0 z-50"
+          style={{ background: 'linear-gradient(90deg, var(--role-editor) 0%, var(--accent) 50%, var(--role-viewer) 100%)' }}
+        />
+
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          {/* Desktop sidebar — visible md+ */}
+          <div className="hidden md:flex w-[64px] lg:w-[240px] shrink-0 sticky top-[2px] h-[calc(100vh-2px)] z-40">
+            <SidebarNav initials={initials} name={name} email={email} />
+          </div>
+
+          {/* Main column */}
+          <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+            <Topbar initials={initials} name={name} />
+            <main className="flex-1 overflow-y-auto px-5 py-6 lg:px-8 lg:py-8">
+              <div className="max-w-[1100px] w-full mx-auto">
+                {children}
+              </div>
+            </main>
+          </div>
         </div>
 
-        {/* Main */}
-        <div className="flex flex-col flex-1 min-w-0">
-          <Topbar />
-          <main className="flex-1 px-7 py-8 max-w-[1200px] w-full">
-            {children}
-          </main>
+        {/* Mobile sidebar drawer — md and below */}
+        <div className="md:hidden">
+          <MobileSidebarNav initials={initials} name={name} email={email} />
         </div>
       </div>
-    </div>
+    </>
   )
 }
