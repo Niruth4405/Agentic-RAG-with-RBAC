@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { RiUploadCloud2Line, RiFilePdfLine } from "react-icons/ri";
 
 const inputStyle: React.CSSProperties = {
@@ -15,6 +16,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 export default function DocumentUploadForm({ adminId }: { adminId: number }) {
+  const router = useRouter();
   const [title, setTitle]             = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile]               = useState<File | null>(null);
@@ -36,7 +38,7 @@ export default function DocumentUploadForm({ adminId }: { adminId: number }) {
     fd.append("description", description.trim());
     fd.append("ownerId", String(adminId));
 
-    const res = await fetch("/api/documents", { method: "POST", body: fd });
+    const res = await fetch("/api/admin/documents", { method: "POST", body: fd });
     setLoading(false);
 
     if (!res.ok) {
@@ -50,6 +52,10 @@ export default function DocumentUploadForm({ adminId }: { adminId: number }) {
     setDescription("");
     setFile(null);
     if (fileRef.current) fileRef.current.value = "";
+
+    // Re-run the server component's data fetching so the table
+    // reflects the new document without a full page reload.
+    router.refresh();
   }
 
   return (
