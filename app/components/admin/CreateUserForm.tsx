@@ -7,10 +7,10 @@ import { RiUserAddLine } from "react-icons/ri";
 const INITIAL: CreateUserState = {};
 
 const ROLE_OPTIONS = [
-  { value: "admin",       label: "Admin",       access: "admin"  },
-  { value: "hr",          label: "HR",           access: "client" },
-  { value: "finance",     label: "Finance",      access: "client" },
-  { value: "engineering", label: "Engineering",  access: "client" },
+  { value: "admin",       label: "Admin",       access: "admin"  ,},
+  { value: "hr",          label: "HR",           access: "hr" },
+  { value: "finance",     label: "Finance",      access: "finance" },
+  { value: "engineering", label: "Engineering",  access: "engineering" },
 ];
 
 const inputStyle: React.CSSProperties = {
@@ -93,7 +93,7 @@ export default function CreateUserForm() {
             <option value="">Select role…</option>
             {ROLE_OPTIONS.map((r) => (
               <option key={r.value} value={r.value}>
-                {r.label} ({r.access})
+                {r.label}
               </option>
             ))}
           </select>

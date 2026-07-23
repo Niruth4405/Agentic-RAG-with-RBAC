@@ -17,7 +17,6 @@ import {
 import ThemeToggle from "../ui/ThemeToggle";
 
 const NAV_LINKS = [
-  { href: "/dashboard",   label: "Overview",    Icon: RiDashboardLine   },
   { href: "/users",       label: "Users",       Icon: RiUserLine        },
   { href: "/documents",   label: "Documents",   Icon: RiFileTextLine    },
   { href: "/permissions", label: "Permissions", Icon: RiShieldCheckLine },
