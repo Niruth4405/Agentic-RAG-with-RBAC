@@ -41,13 +41,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
-      if (user) token.role = (user as any).role;
+    async jwt({ token, user }) {
+      if (user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: parseInt(user.id) },
+          include: { role: true },
+        });
+        token.role = dbUser?.role.name ?? "client";
+        token.fullName = dbUser?.fullName ?? null;
+        token.id = String(dbUser?.id);
+      }
       return token;
     },
-    session({ session, token }) {
-      if (session.user) (session.user as any).role = token.role;
+    async session({ session, token }) {
+      (session.user as any).role = token.role;
+      (session.user as any).fullName = token.fullName;
+      (session.user as any).id = token.id;
       return session;
+    },
+    async redirect({ url, baseUrl, token }) {
+      // called after sign-in; token carries role
+      const role = (token as any)?.role ?? "client";
+      if (role === "admin") return `${baseUrl}/dashboard`;
+      return `${baseUrl}/chat`;
     },
   },
   pages: {

@@ -23,7 +23,7 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-      className="p-1.5 rounded-md transition-colors"
+      className="cursor-pointer p-1.5 rounded-md transition-colors"
       style={{ color: "var(--text-secondary)" }}
     >
       {theme === "dark" ? <RiSunLine size={18} /> : <RiMoonLine size={18} />}

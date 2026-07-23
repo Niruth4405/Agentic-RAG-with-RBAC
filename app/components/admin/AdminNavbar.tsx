@@ -1,160 +1,173 @@
 "use client";
 
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 import { useState } from "react";
-import { RiMenuLine, RiCloseLine, RiShieldKeyholeLine } from "react-icons/ri";
+import {
+  RiDashboardLine,
+  RiUserLine,
+  RiFileTextLine,
+  RiShieldCheckLine,
+  RiHistoryLine,
+  RiLogoutBoxLine,
+  RiMenuLine,
+  RiCloseLine,
+} from "react-icons/ri";
 import ThemeToggle from "../ui/ThemeToggle";
 
 const NAV_LINKS = [
-  { href: "/users",       label: "Users" },
-  { href: "/documents",   label: "Documents" },
-  { href: "/permissions", label: "Permissions" },
-  { href: "/audit-logs",  label: "Audit Logs" },
+  { href: "/dashboard",   label: "Overview",    Icon: RiDashboardLine   },
+  { href: "/users",       label: "Users",       Icon: RiUserLine        },
+  { href: "/documents",   label: "Documents",   Icon: RiFileTextLine    },
+  { href: "/permissions", label: "Permissions", Icon: RiShieldCheckLine },
+  { href: "/audit-logs",  label: "Audit Logs",  Icon: RiHistoryLine     },
 ];
 
-export default function AdminNavbar({ userName }: { userName: string }) {
+export default function AdminNavbar() {
+  const { data: session } = useSession();
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const initials = userName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const adminName =
+    (session?.user as any)?.fullName ??
+    session?.user?.name ??
+    session?.user?.email?.split("@")[0] ??
+    "Admin";
 
   return (
-    <header
-      className="sticky top-0 z-50 w-full border-b"
-      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-    >
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
-
-        {/* Logo */}
-        <div className="flex items-center gap-2 shrink-0">
-          <RiShieldKeyholeLine size={22} style={{ color: "var(--accent)" }} />
-          <span
-            className="font-mono text-sm font-semibold tracking-tight hidden sm:block"
-            style={{ color: "var(--accent)" }}
-          >
+    <>
+      {/* ── Top navbar ── */}
+      <header
+        className="w-full flex items-center justify-between px-6 h-14 border-b shrink-0"
+        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+      >
+        {/* Left: logo + nav links */}
+        <div className="flex items-center gap-6">
+          <span className="font-bold text-sm tracking-tight" style={{ color: "var(--accent)" }}>
             RAG Admin
           </span>
+
+          {/* Desktop nav links */}
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map(({ href, label, Icon }) => {
+              const active = pathname === href || pathname.startsWith(href + "/");
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                  style={{
+                    background: active ? "var(--accent-soft)" : "transparent",
+                    color: active ? "var(--accent)" : "var(--text-secondary)",
+                  }}
+                >
+                  <Icon size={14} />
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((link) => {
-            const active =
-              pathname === link.href || pathname.startsWith(link.href + "/");
-            return (
-              <a
-                key={link.href}
-                href={link.href}
-                className="px-3 py-1.5 text-sm rounded-md transition-colors"
-                style={{
-                  color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                  background: active ? "var(--accent-soft)" : "transparent",
-                  borderBottom: active
-                    ? "2px solid var(--accent)"
-                    : "2px solid transparent",
-                  fontWeight: active ? 500 : 400,
-                }}
-              >
-                {link.label}
-              </a>
-            );
-          })}
-        </nav>
-
-        {/* Right side */}
+        {/* Right: admin name + theme toggle + sign out */}
         <div className="flex items-center gap-3">
-          <ThemeToggle />
-
+          {/* Admin identity */}
           <div className="hidden sm:flex items-center gap-2">
             <div
               className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
-              style={{
-                background: "var(--accent-soft)",
-                color: "var(--accent)",
-                border: "1px solid var(--accent)",
-              }}
+              style={{ background: "var(--accent-soft)", color: "var(--accent)" }}
             >
-              {initials}
+              {adminName[0].toUpperCase()}
             </div>
-            <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              {userName}
-            </span>
+            <div className="leading-tight">
+              <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
+                {adminName}
+              </p>
+              <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+                {session?.user?.email ?? ""}
+              </p>
+            </div>
           </div>
+
+          <ThemeToggle />
 
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="hidden sm:block text-xs px-3 py-1.5 rounded-md border transition-colors"
-            style={{
-              color: "var(--text-secondary)",
-              borderColor: "var(--border-strong)",
-            }}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+            style={{ color: "var(--text-secondary)" }}
           >
+            <RiLogoutBoxLine size={14} />
             Sign out
           </button>
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-1.5 rounded-md"
-            style={{ color: "var(--text-secondary)" }}
-            onClick={() => setMenuOpen((v) => !v)}
+            className="md:hidden"
+            onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
+            style={{ color: "var(--text-primary)" }}
           >
-            {menuOpen ? <RiCloseLine size={20} /> : <RiMenuLine size={20} />}
+            {open ? <RiCloseLine size={20} /> : <RiMenuLine size={20} />}
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Mobile menu */}
-      {menuOpen && (
+      {/* ── Mobile dropdown menu ── */}
+      {open && (
         <div
-          className="md:hidden border-t px-4 py-3 flex flex-col gap-1"
-          style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+          className="md:hidden fixed inset-0 z-40 flex flex-col"
+          onClick={() => setOpen(false)}
         >
-          {NAV_LINKS.map((link) => {
-            const active =
-              pathname === link.href || pathname.startsWith(link.href + "/");
-            return (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="px-3 py-2 text-sm rounded-md transition-colors"
-                style={{
-                  color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                  background: active ? "var(--accent-soft)" : "transparent",
-                  fontWeight: active ? 500 : 400,
-                }}
-              >
-                {link.label}
-              </a>
-            );
-          })}
-          <div
-            className="pt-2 mt-1 border-t flex items-center justify-between"
-            style={{ borderColor: "var(--border)" }}
+          <nav
+            className="border-b px-4 py-3 space-y-1"
+            style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              {userName}
-            </span>
+            <div className="flex items-center gap-2 pb-3 border-b mb-2" style={{ borderColor: "var(--border)" }}>
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
+                style={{ background: "var(--accent-soft)", color: "var(--accent)" }}
+              >
+                {adminName[0].toUpperCase()}
+              </div>
+              <div>
+                <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>{adminName}</p>
+                <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>{session?.user?.email}</p>
+              </div>
+            </div>
+
+            {NAV_LINKS.map(({ href, label, Icon }) => {
+              const active = pathname === href;
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  style={{
+                    background: active ? "var(--accent-soft)" : "transparent",
+                    color: active ? "var(--accent)" : "var(--text-secondary)",
+                  }}
+                >
+                  <Icon size={15} />
+                  {label}
+                </Link>
+              );
+            })}
+
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
-              className="text-xs px-3 py-1.5 rounded-md border"
-              style={{
-                color: "var(--text-secondary)",
-                borderColor: "var(--border-strong)",
-              }}
+              className="flex items-center gap-2 px-3 py-2 w-full text-sm mt-1"
+              style={{ color: "var(--text-secondary)" }}
             >
+              <RiLogoutBoxLine size={14} />
               Sign out
             </button>
-          </div>
+          </nav>
+          <div className="flex-1 bg-black/40 backdrop-blur-sm" />
         </div>
       )}
-    </header>
+    </>
   );
 }
