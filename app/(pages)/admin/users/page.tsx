@@ -20,9 +20,9 @@ export default async function UsersPage() {
   ])
 
   return (
-    <>
+    <div className="flex flex-col gap-4 py-10">
       <CreateUserForm roles={roles} />
       <UsersTable users={users} />
-    </>
+    </div>
   )
 }
