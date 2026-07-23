@@ -19,23 +19,6 @@ export const metadata: Metadata = {
     "Secure admin console for Agentic RAG with Role-Based Access Control",
 };
 
-<<<<<<< Updated upstream
-// Blocking inline script — runs before React hydrates so the DOM attribute
-// is already correct when React reads it. No hydration mismatch.
-const themeScript = `(function(){
-  try {
-    var t = localStorage.getItem('rag-theme');
-    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
-  } catch(e) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
-})();`
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html
-      lang="en"
-=======
 export default function RootLayout({
   children,
 }: {
@@ -46,21 +29,10 @@ export default function RootLayout({
       lang="en"
       data-theme="dark"
       suppressHydrationWarning
->>>>>>> Stashed changes
       className={`${geistSans.variable} ${geistMono.variable} ${ibmMono.variable} h-full`}
       // No data-theme here — set by the blocking script below before hydration
     >
-<<<<<<< Updated upstream
-      <head>
-        {/* Must be the first script in <head> and have no src so it runs synchronously */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body className="min-h-full">{children}</body>
-    </html>
-  )
-=======
       <body className="h-full">{children}</body>
     </html>
   );
->>>>>>> Stashed changes
 }
