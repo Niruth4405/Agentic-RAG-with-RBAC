@@ -62,8 +62,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async redirect({ url, baseUrl, token }) {
       // called after sign-in; token carries role
       const role = (token as any)?.role ?? "client";
-      if (role === "admin") return `${baseUrl}/dashboard`;
-      return `${baseUrl}/chat`;
+      if (role === "admin") return `${baseUrl}/users`;
+      return `${baseUrl}/`;
     },
   },
   pages: {

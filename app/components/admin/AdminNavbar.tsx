@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  RiDashboardLine,
   RiUserLine,
   RiFileTextLine,
   RiShieldCheckLine,
@@ -93,7 +92,7 @@ export default function AdminNavbar() {
 
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+            className="cursor-pointer hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
             style={{ color: "var(--text-secondary)" }}
           >
             <RiLogoutBoxLine size={14} />

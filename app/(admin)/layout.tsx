@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!session) redirect("/login");
   const role = (session.user as any)?.role;
-  if (role !== "admin") redirect("/chat");
+  if (role !== "admin") redirect("/");
 
   const [userCount, documentCount] = await Promise.all([
     prisma.user.count(),
