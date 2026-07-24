@@ -3,6 +3,7 @@ import { auth } from "@/app/lib/auth";
 import DocumentUploadForm from "../../components/admin/DocumentUploadForm";
 import InlinePermissionToggle from "../../components/admin/InlinePermissionToggle";
 import { RiFileTextLine } from "react-icons/ri";
+import DeleteDocumentButton from "@/app/components/admin/DeleteDocumentButton";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,7 @@ export default async function DocumentsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-subtle)" }}>
-              {["Document", "Owner", "Chunks", "Role Access", "Indexed"].map((h) => (
+              {["Document", "Owner", "Chunks", "Role Access", "Indexed","Actions"].map((h) => (
                 <th
                   key={h}
                   className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider"
@@ -95,6 +96,9 @@ export default async function DocumentsPage() {
                   </td>
                   <td className="px-4 py-3 font-mono text-xs" style={{ color: "var(--text-tertiary)" }}>
                     {new Date(doc.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 cursor-pointer">
+                    <DeleteDocumentButton docId={doc.id}/>
                   </td>
                 </tr>
               );
